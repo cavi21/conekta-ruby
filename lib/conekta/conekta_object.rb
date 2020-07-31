@@ -78,7 +78,13 @@ module Conekta
       end
     end
 
+    def set_api_key(_api_key)
+      @api_key ||= _api_key
+    end
+
     protected
+
+    attr_reader :api_key
 
     def to_hash
       hash = Hash.new

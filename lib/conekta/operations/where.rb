@@ -11,10 +11,11 @@ module Conekta
       end
 
       module ClassMethods
-        def where(params=nil)
+        def where(params = nil, _api_key = nil)
           _url = Util.types[self.class_name.downcase]._url
-          response = Requestor.new.request(:get, _url, params)
+          response = Requestor.new(_api_key).request(:get, _url, params)
           instance = ::Conekta::Operations::Where.handle_type_of_paging(response, self.class_name, params)
+          instance.set_api_key(_api_key) if _api_key
           instance.load_from(response)
           instance
         end

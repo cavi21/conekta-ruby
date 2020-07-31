@@ -24,7 +24,7 @@ describe Conekta::Error do
   end
 
   it "test api error" do
-    expect{ 
+    expect{
       Conekta::Customer.create({
         cards: {
           0 => "tok_test_visa_4242"

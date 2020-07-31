@@ -29,25 +29,57 @@ describe Conekta::ShippingLine do
 
   let(:shipping_line) { order.shipping_lines.first }
 
-  context "deleting shipping lines" do
-    it "successful shipping line delete" do
-      shipping_line.delete
+  context "with global api_key" do
+    context "deleting shipping lines" do
+      it "successful shipping line delete" do
+        shipping_line.delete
 
-      expect(shipping_line.deleted).to eq(true)
+        expect(shipping_line.deleted).to eq(true)
+      end
+    end
+
+    context "updating shipping lines" do
+      it "successful shipping line update" do
+        shipping_line.update(method: "Air")
+
+        expect(shipping_line._method).to eq("Air")
+      end
+
+      it "unsuccessful shipping line update" do
+        expect {
+          shipping_line.update(amount: -1)
+        }.to raise_error(Conekta::ParameterValidationError)
+      end
     end
   end
 
-  context "updating shipping lines" do
-    it "successful shipping line update" do
-      shipping_line.update(method: "Air")
+  context "with local api_key" do
+    include_context "local api_key"
 
-      expect(shipping_line._method).to eq("Air")
+    let(:order) do
+      Conekta::Order.create(order_data.merge(shipping_lines: shipping_lines), local_api_key)
     end
 
-    it "unsuccessful shipping line update" do
-      expect {
-        shipping_line.update(amount: -1)
-      }.to raise_error(Conekta::ParameterValidationError)
+    context "deleting shipping lines" do
+      it "successful shipping line delete" do
+        shipping_line.delete
+
+        expect(shipping_line.deleted).to eq(true)
+      end
+    end
+
+    context "updating shipping lines" do
+      it "successful shipping line update" do
+        shipping_line.update(method: "Air")
+
+        expect(shipping_line._method).to eq("Air")
+      end
+
+      it "unsuccessful shipping line update" do
+        expect {
+          shipping_line.update(amount: -1)
+        }.to raise_error(Conekta::ParameterValidationError)
+      end
     end
   end
 end

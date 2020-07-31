@@ -73,6 +73,7 @@ module Conekta
       submodels.each do |submodel|
         self.send(submodel).each do |k, v|
           v.create_attr('customer', customer)
+          v.set_api_key(api_key) if api_key
 
           self.send(submodel).set_val(k,v)
         end if self.respond_to?(submodel) && !self.send(submodel).nil?

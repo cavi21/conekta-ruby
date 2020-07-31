@@ -47,3 +47,16 @@ shared_context "customer" do
     }
   end
 end
+
+shared_context "local api_key" do
+  let(:local_api_key) { 'key_ZLy4aP2szht1HqzkCezDEA' } # Can be another Sandbox key
+  let(:global_api_key) { 'key_ZLy4aP2szht1HqzkCezDEA' }
+
+  before(:all) do
+    Conekta.api_key = ""
+  end
+
+  after(:all) do
+    Conekta.api_key = global_api_key
+  end
+end

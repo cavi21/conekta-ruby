@@ -24,8 +24,10 @@ module Conekta
 
     def create_member_with_relation(member, params, parent)
       parent_klass = parent.class.underscored_class
-      child = self.create_member(member, params)
+      api_key = parent.api_key if parent.api_key
+      child = self.create_member(member, params, api_key)
       child.create_attr(parent_klass.to_s, parent)
+      child.set_api_key(api_key) if api_key
       return child
     end
 

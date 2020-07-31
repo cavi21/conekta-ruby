@@ -52,7 +52,7 @@ module Conekta
     def move_cursor(limit)
       @params["limit"] = limit if !limit.nil? && !limit.to_s.empty?
       _url = Util.types[@elements_type.downcase]._url
-      response = Requestor.new.request(:get, _url, @params)
+      response = Requestor.new(api_key).request(:get, _url, @params)
       self.load_from(response)
     end
   end

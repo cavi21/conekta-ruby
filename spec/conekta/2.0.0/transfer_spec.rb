@@ -28,32 +28,70 @@ describe Conekta::Payout do
     }
   end
 
-  describe 'an instance' do
-    before do
-      payee = Conekta::Payee.create(payee_attributes)
-      payout_method = payee.create_destination(bank_attributes)
+  context "with global api_key" do
+    describe 'an instance' do
+      before do
+        payee = Conekta::Payee.create(payee_attributes)
+        payout_method = payee.create_destination(bank_attributes)
 
-      @payee = Conekta::Payee.find(payee.id)
-    end
+        @payee = Conekta::Payee.find(payee.id)
+      end
 
-    it 'is created successfully' do
-      payout = Conekta::Transfer.create(
-        amount: 5000, currency: "MXN", payee: @payee.id
-      )
-      expect(payout).to be_a(Conekta::Transfer)
-    end
+      it 'is created successfully' do
+        payout = Conekta::Transfer.create(
+          amount: 5000, currency: "MXN", payee: @payee.id
+        )
+        expect(payout).to be_a(Conekta::Transfer)
+      end
 
-    it 'can be retrieved by :id' do
-      transaction = Conekta::Transfer.create(
-        amount: 5000, currency: "MXN", payee: @payee.id
-      )
-      # refetch payout
-      payout = Conekta::Transfer.find(transaction.id)
-      expect(payout).to be_a(Conekta::Transfer)
-    end
+      it 'can be retrieved by :id' do
+        transaction = Conekta::Transfer.create(
+          amount: 5000, currency: "MXN", payee: @payee.id
+        )
+        # refetch payout
+        payout = Conekta::Transfer.find(transaction.id)
+        expect(payout).to be_a(Conekta::Transfer)
+      end
 
-    it 'has a :method attribute' do
-      expect(@payee.destinations.first).to be_a(Conekta::Destination)
+      it 'has a :method attribute' do
+        expect(@payee.destinations.first).to be_a(Conekta::Destination)
+      end
     end
   end
+
+  context "with local api_key" do
+    include_context "local api_key"
+
+    describe 'an instance' do
+      before do
+        payee = Conekta::Payee.create(payee_attributes, local_api_key)
+        payout_method = payee.create_destination(bank_attributes)
+
+        @payee = Conekta::Payee.find(payee.id, local_api_key)
+      end
+
+      it 'is created successfully' do
+        payout = Conekta::Transfer.create(
+          {amount: 5000, currency: "MXN", payee: @payee.id},
+          local_api_key
+        )
+        expect(payout).to be_a(Conekta::Transfer)
+      end
+
+      it 'can be retrieved by :id' do
+        transaction = Conekta::Transfer.create(
+          {amount: 5000, currency: "MXN", payee: @payee.id},
+          local_api_key
+        )
+        # refetch payout
+        payout = Conekta::Transfer.find(transaction.id, local_api_key)
+        expect(payout).to be_a(Conekta::Transfer)
+      end
+
+      it 'has a :method attribute' do
+        expect(@payee.destinations.first).to be_a(Conekta::Destination)
+      end
+    end
+  end
+
 end

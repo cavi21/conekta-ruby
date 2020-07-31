@@ -48,29 +48,62 @@ describe Conekta::Customer do
         }
       end
 
-      it "successfully creates source for customer" do
-        customer = Conekta::Customer.create(customer_oxxo)
-        source = customer.payment_sources.first
+      context "with global api_key" do
+        it "successfully creates source for customer" do
+          customer = Conekta::Customer.create(customer_oxxo)
+          source = customer.payment_sources.first
 
-        expect(source.class.to_s).to eq('Conekta::PaymentSource')
-        expect(customer.payment_sources.class.to_s).to eq('Conekta::List')
-        expect(source.reference.size).to eq(14)
+          expect(source.class.to_s).to eq('Conekta::PaymentSource')
+          expect(customer.payment_sources.class.to_s).to eq('Conekta::List')
+          expect(source.reference.size).to eq(14)
+        end
+
+        it 'successfully creates oxxo recurrent reference for customer' do
+          source = customer.create_offline_recurrent_reference(oxxo_source_params)
+
+          expect(source.class.to_s).to eq("Conekta::PaymentSource")
+          expect(customer.payment_sources.class.to_s).to eq("Conekta::List")
+          expect(source.reference.size).to eq(14)
+        end
+
+        it "successfully creates shipping contact for customer" do
+          shipping_contact =
+            customer.create_shipping_contact(shipping_contact_params)
+
+          expect(shipping_contact.class.to_s).to eq("Conekta::ShippingContact")
+          expect(customer.shipping_contacts.class.to_s).to eq("Conekta::List")
+        end
       end
 
-      it 'successfully creates oxxo recurrent reference for customer' do
-        source = customer.create_offline_recurrent_reference(oxxo_source_params)
+      context "with local api_key" do
+        include_context "local api_key"
 
-        expect(source.class.to_s).to eq("Conekta::PaymentSource")
-        expect(customer.payment_sources.class.to_s).to eq("Conekta::List")
-        expect(source.reference.size).to eq(14)
-      end
+        let(:customer) { Conekta::Customer.create(customer_data, local_api_key) }
 
-      it "successfully creates shipping contact for customer" do
-        shipping_contact =
-          customer.create_shipping_contact(shipping_contact_params)
+        it "successfully creates source for customer" do
+          customer = Conekta::Customer.create(customer_oxxo, local_api_key)
+          source = customer.payment_sources.first
 
-        expect(shipping_contact.class.to_s).to eq("Conekta::ShippingContact")
-        expect(customer.shipping_contacts.class.to_s).to eq("Conekta::List")
+          expect(source.class.to_s).to eq('Conekta::PaymentSource')
+          expect(customer.payment_sources.class.to_s).to eq('Conekta::List')
+          expect(source.reference.size).to eq(14)
+        end
+
+        it 'successfully creates oxxo recurrent reference for customer' do
+          source = customer.create_offline_recurrent_reference(oxxo_source_params)
+
+          expect(source.class.to_s).to eq("Conekta::PaymentSource")
+          expect(customer.payment_sources.class.to_s).to eq("Conekta::List")
+          expect(source.reference.size).to eq(14)
+        end
+
+        it "successfully creates shipping contact for customer" do
+          shipping_contact =
+            customer.create_shipping_contact(shipping_contact_params)
+
+          expect(shipping_contact.class.to_s).to eq("Conekta::ShippingContact")
+          expect(customer.shipping_contacts.class.to_s).to eq("Conekta::List")
+        end
       end
     end
   end
