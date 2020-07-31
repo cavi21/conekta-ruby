@@ -1,10 +1,10 @@
 module Conekta
   module Operations
     module CreateMember
-      def create_member(member, params)
+      def create_member(member, params, _api_key = nil)
         _url     = [self._url, member].join('/')
         member   = member.to_sym
-        response = Requestor.new.request(:post, _url, params)
+        response = Requestor.new(_api_key).request(:post, _url, params)
 
         if self.send(member) &&
            (self.send(member).class.class_name == "ConektaObject" ||

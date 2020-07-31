@@ -3,7 +3,7 @@ module Conekta
     module CustomAction
       def custom_action(method, action=nil, params=nil)
         _url     = action ? [self._url, action].join('/') : self._url
-        response = Requestor.new.request(method, _url, params)
+        response = Requestor.new(api_key).request(method, _url, params)
 
         self.load_from(response)
         self

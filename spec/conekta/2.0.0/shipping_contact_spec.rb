@@ -34,27 +34,60 @@ describe Conekta::ShippingContact do
                                merge(shipping_contacts: shipping_contacts))
   end
 
- let(:shipping_contact) { customer.shipping_contacts.first }
+  let(:shipping_contact) { customer.shipping_contacts.first }
 
-  context "deleting shipping contacts" do
-    it "successful shipping contact delete" do
-      shipping_contact.delete
+  context "with global api_key" do
+    context "deleting shipping contacts" do
+      it "successful shipping contact delete" do
+        shipping_contact.delete
 
-      expect(shipping_contact.deleted).to eq(true)
+        expect(shipping_contact.deleted).to eq(true)
+      end
+    end
+
+    context "updating shipping contacts" do
+      it "successful shipping contact update" do
+        shipping_contact.update(receiver: "Mario Moreno")
+
+        expect(shipping_contact.receiver).to eq("Mario Moreno")
+      end
+
+      it "unsuccessful shipping contact update" do
+        expect {
+          shipping_contact.update(receiver: 123)
+        }.to raise_error(Conekta::Error)
+      end
     end
   end
 
-  context "updating shipping contacts" do
-    it "successful shipping contact update" do
-      shipping_contact.update(receiver: "Mario Moreno")
+  context "with local api_key" do
+    include_context "local api_key"
 
-      expect(shipping_contact.receiver).to eq("Mario Moreno")
+    let(:customer) do
+      Conekta::Customer.create(customer_data.
+                                 merge(shipping_contacts: shipping_contacts), local_api_key)
     end
 
-    it "unsuccessful shipping contact update" do
-      expect {
-        shipping_contact.update(receiver: 123)
-      }.to raise_error(Conekta::Error)
+    context "deleting shipping contacts" do
+      it "successful shipping contact delete" do
+        shipping_contact.delete
+
+        expect(shipping_contact.deleted).to eq(true)
+      end
+    end
+
+    context "updating shipping contacts" do
+      it "successful shipping contact update" do
+        shipping_contact.update(receiver: "Mario Moreno")
+
+        expect(shipping_contact.receiver).to eq("Mario Moreno")
+      end
+
+      it "unsuccessful shipping contact update" do
+        expect {
+          shipping_contact.update(receiver: 123)
+        }.to raise_error(Conekta::Error)
+      end
     end
   end
 end

@@ -21,3 +21,4 @@ tags
 *.swp
 *.un~
 .byebug_history
+.gs

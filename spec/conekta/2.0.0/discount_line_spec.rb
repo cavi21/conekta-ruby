@@ -25,25 +25,57 @@ describe Conekta::DiscountLine do
 
   let(:discount_line) { order.discount_lines.first }
 
-  context "deleting discount lines" do
-    it "successful discount line delete" do
-      discount_line.delete
+  context "with global api_key" do
+    context "deleting discount lines" do
+      it "successful discount line delete" do
+        discount_line.delete
 
-      expect(discount_line.deleted).to eq(true)
+        expect(discount_line.deleted).to eq(true)
+      end
+    end
+
+    context "updating discount lines" do
+      it "successful discount line update" do
+        discount_line.update(amount: 11)
+
+        expect(discount_line.amount).to eq(11)
+      end
+
+      it "unsuccessful discount line update" do
+        expect {
+          discount_line.update(amount: -1)
+        }.to raise_error(Conekta::ParameterValidationError)
+      end
     end
   end
 
-  context "updating discount lines" do
-    it "successful discount line update" do
-      discount_line.update(amount: 11)
+  context "with local api_key" do
+    include_context "local api_key"
 
-      expect(discount_line.amount).to eq(11)
+    let(:order) do
+      Conekta::Order.create(order_data.merge(discount_lines: discount_lines), local_api_key)
     end
 
-    it "unsuccessful discount line update" do
-      expect {
-        discount_line.update(amount: -1)
-      }.to raise_error(Conekta::ParameterValidationError)
+    context "deleting discount lines" do
+      it "successful discount line delete" do
+        discount_line.delete
+
+        expect(discount_line.deleted).to eq(true)
+      end
+    end
+
+    context "updating discount lines" do
+      it "successful discount line update" do
+        discount_line.update(amount: 11)
+
+        expect(discount_line.amount).to eq(11)
+      end
+
+      it "unsuccessful discount line update" do
+        expect {
+          discount_line.update(amount: -1)
+        }.to raise_error(Conekta::ParameterValidationError)
+      end
     end
   end
 end

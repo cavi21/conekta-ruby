@@ -50,7 +50,7 @@ module Conekta
     end
 
     def create_charge(params)
-      self.create_member('charges', params)
+      self.create_member('charges', params, api_key)
     end
 
     def create_shipping_contact(params)
@@ -76,6 +76,7 @@ module Conekta
       submodels.each do |submodel|
         self.send(submodel).each do |k, v|
           v.create_attr('order', order)
+          v.set_api_key(api_key) if api_key
 
           self.send(submodel).set_val(k,v)
         end if self.respond_to?(submodel) && !self.send(submodel).nil?

@@ -28,25 +28,55 @@ describe Conekta::LineItem do
   let(:order)     { Conekta::Order.create(order_data) }
   let(:line_item) { order.line_items.first }
 
-  context "deleting line items" do
-    it "successful line item delete" do
-      line_item.delete
+  context "with global api_key" do
+    context "deleting line items" do
+      it "successful line item delete" do
+        line_item.delete
 
-      expect(line_item.deleted).to eq(true)
+        expect(line_item.deleted).to eq(true)
+      end
+    end
+
+    context "updating line items" do
+      it "successful line item update" do
+        line_item.update(unit_price: 1000)
+
+        expect(line_item.unit_price).to eq(1000)
+      end
+
+      it "unsuccessful line item update" do
+        expect {
+          line_item.update(description: nil)
+        }.to raise_error(Conekta::ParameterValidationError)
+      end
     end
   end
 
-  context "updating line items" do
-    it "successful line item update" do
-      line_item.update(unit_price: 1000)
+  context "with local api_key" do
+    include_context "local api_key"
 
-      expect(line_item.unit_price).to eq(1000)
+    let(:order) { Conekta::Order.create(order_data, local_api_key) }
+
+    context "deleting line items" do
+      it "successful line item delete" do
+        line_item.delete
+
+        expect(line_item.deleted).to eq(true)
+      end
     end
 
-    it "unsuccessful line item update" do
-      expect {
-        line_item.update(description: nil)
-      }.to raise_error(Conekta::ParameterValidationError)
+    context "updating line items" do
+      it "successful line item update" do
+        line_item.update(unit_price: 1000)
+
+        expect(line_item.unit_price).to eq(1000)
+      end
+
+      it "unsuccessful line item update" do
+        expect {
+          line_item.update(description: nil)
+        }.to raise_error(Conekta::ParameterValidationError)
+      end
     end
   end
 

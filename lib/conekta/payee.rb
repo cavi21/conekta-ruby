@@ -35,12 +35,12 @@ module Conekta
 
     def create_payout_method(params)
       raise_version_error("1.0.0") if Conekta.api_version > "1.0.0"
-      self.create_member('payout_methods', params)
+      self.create_member('payout_methods', params, api_key)
     end
 
     def create_destination(params)
       raise_version_error("2.0.0") if Conekta.api_version <= "1.0.0"
-      self.create_member('destinations', params)
+      self.create_member('destinations', params, api_key)
     end
 
     private
